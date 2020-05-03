@@ -1,23 +1,21 @@
-/* eslint-disabled */
 import React, {useCallback, useReducer} from 'react'
-// SharedComponents
-import {VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE} from './../../shared/util/validators'
 // Components
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+// SharedComponents
+import {VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE} from './../../shared/util/validators'
 // CSS Styles
-import './NewPlace.css'
-
+import './PlaceForm.css'
 
 const formReducer = (state, action) => {
     switch (action.type) {
         case 'INPUT_CHANGE':
-            let formIsValid = true
+            let formIsValid = true;
             for (const inputId in state.inputs) {
                 if (inputId === action.inputId) {
-                    formIsValid = formIsValid && action.isValid
+                    formIsValid = formIsValid && action.isValid;
                 } else {
-                    formIsValid = formIsValid && state.inputs[inputId].isValid
+                    formIsValid = formIsValid && state.inputs[inputId].isValid;
                 }
             }
             return {
@@ -27,12 +25,11 @@ const formReducer = (state, action) => {
                     [action.inputId]: {value: action.value, isValid: action.isValid}
                 },
                 isValid: formIsValid
-            }
+            };
         default:
-            return state
-
+            return state;
     }
-}
+};
 
 const NewPlace = () => {
     const [formState, dispatch] = useReducer(formReducer, {
@@ -44,45 +41,61 @@ const NewPlace = () => {
             description: {
                 value: '',
                 isValid: false
+            },
+            address: {
+                value: '',
+                isValid: false
             }
-
         },
         isValid: false
-    })
+    });
 
-    // Re render component to avoid infinite loops
     const inputHandler = useCallback((id, value, isValid) => {
         dispatch({
             type: 'INPUT_CHANGE',
             value: value,
             isValid: isValid,
             inputId: id
-        })
-    }, [])
+        });
+    }, []);
 
-    return <form className="place-form">
-        <Input
-            id="title"
-            element="input"
-            type="text"
-            label="Title"
-            validators={[VALIDATOR_REQUIRE()]}
-            errorText="Please enter a valid title."
-            onInput={inputHandler()}
-        />
-        <Input
-            id="description"
-            element="textarea"
-            type="text"
-            label="Description"
-            validators={[VALIDATOR_REQUIRE(), VALIDATOR_MINLENGTH(5)]}
-            errorText="Please enter a valid description (at least 5 characters)."
-            onInput={inputHandler()}
-        />
-        <Button type="submit" disabled={!formState.isValid}>ADD PLACE</Button>
-    </form>
-}
+    const placeSubmitHandler = event => {
+        event.preventDefault()
+        console.log(formState.inputs) // send this to the backend !
+    }
 
-export default NewPlace
+    return (
+        <form className="place-form" onSubmit={placeSubmitHandler}>
+            <Input
+                id="title"
+                element="input"
+                type="text"
+                label="Title"
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter a valid title."
+                onInput={inputHandler}
+            />
+            <Input
+                id="description"
+                element="textarea"
+                label="Description"
+                validators={[VALIDATOR_MINLENGTH(5)]}
+                errorText="Please enter a valid description (at least 5 characters)."
+                onInput={inputHandler}
+            />
+            <Input
+                id="address"
+                element="input"
+                label="Address"
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter a valid address."
+                onInput={inputHandler}
+            />
+            <Button type="submit" disabled={!formState.isValid}>
+                ADD PLACE
+            </Button>
+        </form>
+    );
+};
 
-
+export default NewPlace;

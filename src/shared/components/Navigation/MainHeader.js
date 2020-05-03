@@ -1,6 +1,5 @@
 import React from 'react';
 
-// CSS Styles
 import './MainHeader.css';
 
 const MainHeader = props => {
