@@ -1,2 +1,2 @@
 # this line prevent upload node_modules
-/node_modules
+/*/node_modules
