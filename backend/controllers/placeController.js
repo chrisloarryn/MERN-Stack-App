@@ -2,7 +2,7 @@ const placeService = require('./../services/placeServices')
 
 // 
 exports.getAllPlaces = placeService.getAllPlacesService
-exports.getPlaceByUserId = placeService.getPlaceByUserIdService
+exports.getPlacesByUserId = placeService.getPlacesByUserIdService
 
 // CRUD operations
 exports.createPlace = placeService.createPlaceService
