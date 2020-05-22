@@ -1,3 +1,5 @@
+const uuid = require('uuid').v4
+
 const catchAsync = require('./../utils/catchAsync')
 const AppError = require('./../utils/appError')
 
@@ -42,8 +44,30 @@ exports.getPlaceByIdService = catchAsync(async (req, res, next) => {
   })
 })
 
+exports.updatePlaceByIdService = catchAsync(async (req, res, next) => {
+  const { title, description } = req.body
+  const { placeId } = req.params
+  const updatedPlace = {... await DUMMY_PLACES.find(place => place.id === placeId)}
+  const placeIndex = await DUMMY_PLACES.findIndex(place => place.id === placeId)
+  updatedPlace.title = title
+  updatedPlace.description = description
+
+  DUMMY_PLACES[placeIndex] = updatedPlace
+
+  if (!updatedPlace) {
+    return next(
+      new AppError('Could not find a place for the provided user id.', 404)
+    )
+  }
+  res.status(200).json({
+    message: 'success',
+    data: {
+      place: updatedPlace
+    }
+  })
+})
+
 exports.getAllPlacesService = catchAsync(async (req, res, next) => {
-  console.log('Get request in places')
   const places = await DUMMY_PLACES
   if (!places) {
     return next(new AppError('Could not find places.', 404))
@@ -75,6 +99,7 @@ exports.getPlaceByUserIdService = catchAsync(async (req, res, next) => {
 exports.createPlaceService = (req, res, next) => {
   const { title, description, coordinates, address, creator } = req.body
   const createdPlace = {
+    id: uuid(),
     title,
     description,
     location: coordinates,
