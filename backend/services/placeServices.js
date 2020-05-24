@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator')
 
 const catchAsync = require('./../utils/catchAsync')
 const AppError = require('./../utils/appError')
+const getCoordsForAddress = require('./../utils/location')
 
 let DUMMY_PLACES = [
   {
@@ -118,16 +119,24 @@ exports.getPlacesByUserIdService = catchAsync(async (req, res, next) => {
   })
 })
 
-exports.createPlaceService = (req, res, next) => {
+exports.createPlaceService = catchAsync(async (req, res, next) => {
   // Validate the request for not allow empty fields
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     return next(
-      new AppError('Invalid inputs passed, please check your data.', 422)
+      next(new AppError('Invalid inputs passed, please check your data.', 422))
     )
   }
 
-  const { title, description, coordinates, address, creator } = req.body
+  const { title, description, address, creator } = req.body
+
+  let coordinates
+  try {
+    coordinates = await getCoordsForAddress(address)
+  } catch (err) {
+    return next(new AppError('Invalid coordinates', 503))
+  }
+
   const createdPlace = {
     id: uuid(),
     title,
@@ -141,7 +150,7 @@ exports.createPlaceService = (req, res, next) => {
     message: 'success',
     place: createdPlace
   })
-}
+})
 
 /**
  * {
