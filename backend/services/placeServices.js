@@ -145,6 +145,7 @@ exports.createPlaceService = catchAsync(async (req, res, next) => {
     address,
     creator
   }
+  
   DUMMY_PLACES.push(createdPlace) // unshift(createdPlace)
   res.status(201).json({
     message: 'success',
