@@ -4,6 +4,7 @@ const { validationResult } = require('express-validator')
 const catchAsync = require('./../utils/catchAsync')
 const AppError = require('./../utils/appError')
 const getCoordsForAddress = require('./../utils/location')
+const Place = require('../models/place')
 
 let DUMMY_PLACES = [
   {
@@ -32,7 +33,15 @@ let DUMMY_PLACES = [
 
 exports.getPlaceByIdService = catchAsync(async (req, res, next) => {
   const { placeId } = req.params
-  const place = await DUMMY_PLACES.find(place => place.id === placeId)
+  // const place = await Place.findById(placeId)
+  let place
+  try {
+    place = await Place.findById(placeId)
+  } catch (error) {
+    return next(
+      new AppError('Something went wrong, could not find place.', 500)
+    )
+  }
   if (!place) {
     return next(
       new AppError('Could not find a place for the provided user id.', 404)
@@ -91,7 +100,7 @@ exports.deletePlaceByIdService = catchAsync(async (req, res, next) => {
 })
 
 exports.getAllPlacesService = catchAsync(async (req, res, next) => {
-  const places = await DUMMY_PLACES
+  const places = await Place.find()
   if (!places) {
     return next(new AppError('Could not find places.', 404))
   }
@@ -137,16 +146,25 @@ exports.createPlaceService = catchAsync(async (req, res, next) => {
     return next(new AppError('Invalid coordinates', 503))
   }
 
-  const createdPlace = {
-    id: uuid(),
+  const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image:
+      'https://static2.abc.es/media/tecnologia/2020/01/20/whatsapp-youtube-kHFB--620x349@abc.jpg',
     creator
+  })
+
+  try {
+    await createdPlace.save()
+  } catch (err) {
+    next(new AppError('Creating place failed, please try again.', 500))
   }
-  
-  DUMMY_PLACES.push(createdPlace) // unshift(createdPlace)
+  // catchAsync(
+  //   await createdPlace.save()
+  // )
+
   res.status(201).json({
     message: 'success',
     place: createdPlace
