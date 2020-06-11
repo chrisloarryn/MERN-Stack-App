@@ -20,7 +20,9 @@ const DB = process.env.MONGO_URI_DATABASE.replace(
   process.env.MONGO_PASSWORD
 )
 
+const DB2 = process.env.MONGO_URI_PLACES
 // DB || process.env.DATABASE_LOCAL
+
 mongoose
   .connect(DB, {
     useNewUrlParser: true,
@@ -31,7 +33,9 @@ mongoose
   .then(con => {
     console.log(`DB Connection Successfully! 😁`)
     // console.log(process.env)
-  })
+  }).catch(err => {
+      console.log('Error while creating connection.', err)
+})
 
 const port = process.env.PORT || 3000
 

@@ -35,13 +35,13 @@ exports.getPlaceByIdService = catchAsync(async (req, res, next) => {
   const { placeId } = req.params
   // const place = await Place.findById(placeId)
   let place
-  try {
-    place = await Place.findById(placeId)
-  } catch (error) {
-    return next(
-      new AppError('Something went wrong, could not find place.', 500)
-    )
-  }
+  // try {
+  place = await Place.findById(placeId)
+  // } catch (error) {
+  //   return next(
+  //     new AppError('Something went wrong, could not find place.', 500)
+  //   )
+  // }
   if (!place) {
     return next(
       new AppError('Could not find a place for the provided user id.', 404)
@@ -50,10 +50,11 @@ exports.getPlaceByIdService = catchAsync(async (req, res, next) => {
   res.status(200).json({
     message: 'success',
     data: {
-      place
+      place: place.toObject({ getters: true })
     }
   })
 })
+
 
 exports.updatePlaceByIdService = catchAsync(async (req, res, next) => {
   const { placeId } = req.params
@@ -104,10 +105,11 @@ exports.getAllPlacesService = catchAsync(async (req, res, next) => {
   if (!places) {
     return next(new AppError('Could not find places.', 404))
   }
+
   res.status(200).json({
     message: 'success',
     data: {
-      places
+      places: places.map(p => p.toObject({ getters: true }))
     }
   })
 })
@@ -183,5 +185,5 @@ exports.createPlaceService = catchAsync(async (req, res, next) => {
 	"address": "sfd",
 	"creator": "u5"
 }
- * 
+ *
  * */
