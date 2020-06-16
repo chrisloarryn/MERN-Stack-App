@@ -24,8 +24,9 @@ const placeSchema = new Schema({
     lng: { type: Number, required: [true, 'The longitude is required.'] }
   },
   creator: {
-    type: String,
-    required: [true, 'The creator is required.']
+    type: mongoose.Types.ObjectId,
+    required: [true, 'The creator is required.'],
+    ref: 'User'
   }
 })
 

@@ -7,7 +7,7 @@ console.log('load node process env', process.env.NODE_ENV)
 
 const loadConfig = () => {
     if (process.env.NODE_ENV === 'production') {
-        dotenv.config({ path: path.join(__dirname, './.env-prod') })
+        dotenv.config({ path: path.join(__dirname, './.env') })
         console.log('charge production configs')
     } else if (process.env.NODE_ENV === 'staging') {
         dotenv.config({ path: path.join(__dirname, './.env-staging') })
