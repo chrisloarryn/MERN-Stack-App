@@ -1,35 +1,12 @@
 const uuid = require('uuid').v4
 const {validationResult} = require('express-validator')
+const mongoose = require('mongoose')
 
 const catchAsync = require('./../utils/catchAsync')
 const AppError = require('./../utils/appError')
 const getCoordsForAddress = require('./../utils/location')
 const Place = require('../models/place')
-
-let DUMMY_PLACES = [
-    {
-        id: 'p1',
-        title: 'Empire State Building',
-        description: 'One of the most famous sky scrapers in the world!',
-        location: {
-            lat: 40.7484474,
-            lng: -73.9871516
-        },
-        address: '20 W 34th St, New York, NY 10001',
-        creator: 'u1'
-    },
-    {
-        id: 'p8',
-        title: 'Empire State vBuilding',
-        description: 'One of the most famous sky scrapers in the world!',
-        location: {
-            lat: 40.7484474,
-            lng: -73.9871516
-        },
-        address: '20 W 34th St, New York, NY 10001',
-        creator: 'u5'
-    }
-]
+const User = require('./../models/user')
 
 exports.getPlaceByIdService = catchAsync(async (req, res, next) => {
     const {placeId} = req.params
@@ -90,13 +67,32 @@ exports.updatePlaceByIdService = catchAsync(async (req, res, next) => {
 exports.deletePlaceByIdService = catchAsync(async (req, res, next) => {
     const {placeId} = req.params
 
-    const place = await Place.findById(placeId)
+    let place;
 
-    if (!place) {
-        return next(new AppError('Could not find a place for the provided user id.', 404))
+    try {
+        place = await Place.findById(placeId).populate('creator')
+    } catch (err) {
+        return next(new AppError('Finding place failed, please try again.', 500))
     }
 
-    place.remove({_id: placeId})
+    if (!place) {
+        return next(new AppError('Could not find a place for the provided id.', 404))
+    }
+
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await place.remove({ session: sess });
+        place.creator.places.pull(place);
+        await place.creator.save({ session: sess });
+        await sess.commitTransaction();
+    } catch(err) {
+        return next(new AppError('Deleting place failed, please try again.', 500))
+    }
+
+    
+
+    // place.remove({_id: placeId})
 
     res.status(200).json({
         message: 'success',
@@ -120,8 +116,18 @@ exports.getAllPlacesService = catchAsync(async (req, res, next) => {
 
 exports.getPlacesByUserIdService = catchAsync(async (req, res, next) => {
     const {userId} = req.params
-    const places = await Place.find({creator: userId})
-    if (!places || places.length === 0) {
+
+    // let places
+    let userWithPlaces;
+    try {
+        userWithPlaces = await User.findById(userId).populate('places')
+    } catch (err) {
+        return next(
+            new AppError('Fetching places failed, please try again later.', 404)
+        )
+    }
+    // const places = await Place.find({creator: userId})
+    if (!userWithPlaces || userWithPlaces.places.length === 0) {
         return next(
             new AppError('Could not find a places for the provided user id.', 404)
         )
@@ -129,7 +135,7 @@ exports.getPlacesByUserIdService = catchAsync(async (req, res, next) => {
     res.status(200).json({
         message: 'success',
         data: {
-            places: places.map(p => p.toObject({getters: true}))
+            places: userWithPlaces.places.map(p => p.toObject({getters: true}))
         }
     })
 })
@@ -162,10 +168,24 @@ exports.createPlaceService = catchAsync(async (req, res, next) => {
         creator
     })
 
+    let user;
     try {
-        await createdPlace.save()
+        user = await User.findById(creator)
     } catch (err) {
-        next(new AppError('Creating place failed, please try again.', 500))
+        return next(new AppError('Creating place failed, please try again(user doesn\'t exist).', 500))
+    }
+
+    if(!user) return next(new AppError('Could not find user for the provided id.', 404))
+
+    try {
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await createdPlace.save({ session: sess })
+        user.places.push(createdPlace);
+        await user.save({ session: sess })
+        await sess.commitTransaction();
+    } catch (err) {
+        return next(new AppError('Creating place failed, please try again.', 500))
     }
     // catchAsync(
     //   await createdPlace.save()
