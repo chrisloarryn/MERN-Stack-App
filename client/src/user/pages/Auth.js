@@ -1,64 +1,86 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react'
 
-import Card from '../../shared/components/UIElements/Card';
-import Input from '../../shared/components/FormElements/Input';
-import Button from '../../shared/components/FormElements/Button';
+import Card from '../../shared/components/UIElements/Card'
+import Input from '../../shared/components/FormElements/Input'
+import Button from '../../shared/components/FormElements/Button'
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
-  VALIDATOR_REQUIRE
-} from '../../shared/util/validators';
-import { useForm } from '../../shared/hooks/form-hook';
-import { AuthContext } from '../../shared/context/auth-context';
-import './Auth.css';
+  VALIDATOR_REQUIRE,
+} from '../../shared/util/validators'
+import { useForm } from '../../shared/hooks/form-hook'
+import { AuthContext } from '../../shared/context/auth-context'
+import './Auth.css'
 
 const Auth = () => {
-  const auth = useContext(AuthContext);
-  const [isLoginMode, setIsLoginMode] = useState(true);
+  const auth = useContext(AuthContext)
+  const [isLoginMode, setIsLoginMode] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState()
 
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
         value: '',
-        isValid: false
+        isValid: false,
       },
       password: {
         value: '',
-        isValid: false
-      }
+        isValid: false,
+      },
     },
-    false
-  );
+    false,
+  )
 
   const switchModeHandler = () => {
     if (!isLoginMode) {
       setFormData(
         {
           ...formState.inputs,
-          name: undefined
+          name: undefined,
         },
-        formState.inputs.email.isValid && formState.inputs.password.isValid
-      );
+        formState.inputs.email.isValid && formState.inputs.password.isValid,
+      )
     } else {
       setFormData(
         {
           ...formState.inputs,
           name: {
             value: '',
-            isValid: false
-          }
+            isValid: false,
+          },
         },
-        false
-      );
+        false,
+      )
     }
-    setIsLoginMode(prevMode => !prevMode);
-  };
+    setIsLoginMode((prevMode) => !prevMode)
+  }
 
-  const authSubmitHandler = event => {
-    event.preventDefault();
-    console.log(formState.inputs);
-    auth.login();
-  };
+  const authSubmitHandler = async (event) => {
+    event.preventDefault()
+    const { email, password, name } = formState.inputs
+    if (isLoginMode) {
+      auth.login()
+    } else {
+      try {
+        setIsLoading(true )
+        const response = await fetch('http://localhost:5000/api/v1/users/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name.value,
+            email: email.value,
+            password: password.value,
+          }),
+        })
+        const responseData = await response.json()
+        console.log(responseData)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    console.log(formState.inputs)
+  }
 
   return (
     <Card className="authentication">
@@ -102,7 +124,7 @@ const Auth = () => {
         SWITCH TO {isLoginMode ? 'SIGNUP' : 'LOGIN'}
       </Button>
     </Card>
-  );
-};
+  )
+}
 
-export default Auth;
+export default Auth
