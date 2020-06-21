@@ -25,9 +25,19 @@ app.use((req, res, next) => {
 
 // Set as Json
 app.use(bodyParser.json({ limit: '10kb' }))
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE')
+    next()
+})
+
 app.use(bodyParser.urlencoded({ extended: true, limit: '10kb' }))
 // app.use(bodyParser.urlencoded({ extended: false }))
 // app.use(bodyParser.json())
+
+
 
 // 2) ROUTES
 app.use(`${service}${version}`, apiRouter)
