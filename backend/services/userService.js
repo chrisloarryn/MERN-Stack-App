@@ -6,24 +6,21 @@ const AppError = require('./../utils/appError')
 
 const User = require('./../models/user');
 
-const DUMMY_USERS = [
-    {
-        id: 'u1',
-        name: 'Max Schwarz',
-        email: 'test@example.com',
-        password: 'testers'
-    }
-]
-
 exports.getAllUsersService = catchAsync(async (req, res, next) => {
-    const users = await User.find({}, '-password');
+    let users;
+    try {
+        users = await User.find({}, '-password');
+    } catch (error) {
+        return next(
+            new AppError('Something went wrong, please try again.', 404)
+        )
+    }
 
     if (!users || users.length === 0) {
         return next(
             new AppError('There are no users registered!.', 404)
         )
     }
-
     res.status(200).json({
         message: 'success',
         users: users.map(
