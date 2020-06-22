@@ -30,7 +30,6 @@ export const useHttpClient = () => {
             setIsLoading(false)
             throw err
         }
-        setIsLoading(false)
     }, [])
 
     const clearError = (error) => setError(null)

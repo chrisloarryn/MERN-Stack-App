@@ -142,6 +142,7 @@ exports.getPlacesByUserIdService = catchAsync(async (req, res, next) => {
 
 exports.createPlaceService = catchAsync(async (req, res, next) => {
     // Validate the request for not allow empty fields
+    console.log(req.body);
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         return next(
@@ -150,7 +151,6 @@ exports.createPlaceService = catchAsync(async (req, res, next) => {
     }
 
     const {title, description, address, creator} = req.body
-
     let coordinates
     try {
         coordinates = await getCoordsForAddress(address)

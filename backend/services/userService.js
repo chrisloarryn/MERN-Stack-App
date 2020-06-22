@@ -1,5 +1,5 @@
 const uuid = require('uuid').v4
-const {validationResult} = require('express-validator')
+const { validationResult } = require('express-validator')
 
 const catchAsync = require('./../utils/catchAsync')
 const AppError = require('./../utils/appError')
@@ -24,7 +24,7 @@ exports.getAllUsersService = catchAsync(async (req, res, next) => {
     res.status(200).json({
         message: 'success',
         users: users.map(
-            user => user.toObject({getters: true})
+            user => user.toObject({ getters: true })
         )
     })
 })
@@ -37,8 +37,8 @@ exports.signUpService = catchAsync(async (req, res, next) => {
             new AppError('Invalid inputs passed, please check your data.', 422)
         )
     }
-    const {name, email, password, places} = req.body
-    const existingUser = await User.findOne({email: email});
+    const { name, email, password, places } = req.body
+    const existingUser = await User.findOne({ email: email });
 
     if (existingUser) {
         return next(
@@ -57,21 +57,20 @@ exports.signUpService = catchAsync(async (req, res, next) => {
     await createdUser.save()
     res.status(201).json({
         message: 'success',
-        user: createdUser.toObject({getters: true})
+        user: createdUser.toObject({ getters: true })
     })
 })
 
 exports.logInService = catchAsync(async (req, res, next) => {
-    const {email, password} = req.body
-    const existingUser = await User.findOne({email: email});
+    const { email, password } = req.body
+    const existingUser = await User.findOne({ email: email });
 
     if (!existingUser || existingUser.password !== password) {
         return next(
             new AppError('Invalid credentials, could not log you in.', 401)
         )
     }
-
-    res.json({message: 'success', user: 'Successfully logged in'})
+    res.json({ message: 'success', user: existingUser.toObject({ getters: true }) })
     /*
       {
       "name": "juan",

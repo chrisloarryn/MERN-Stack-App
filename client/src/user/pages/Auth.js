@@ -4,7 +4,7 @@ import Card from '../../shared/components/UIElements/Card'
 import Input from '../../shared/components/FormElements/Input'
 import Button from '../../shared/components/FormElements/Button'
 import ErrorModal from '../../shared/components/UIElements/ErrorModal'
-import Loading from '../../shared/components/UIElements/LoadingSpinner'
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
@@ -14,7 +14,6 @@ import { useForm } from '../../shared/hooks/form-hook'
 import { useHttpClient } from '../../shared/hooks/http-hook'
 import { AuthContext } from '../../shared/context/auth-context'
 import './Auth.css'
-import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner'
 
 const Auth = () => {
   const auth = useContext(AuthContext)
@@ -72,8 +71,8 @@ const Auth = () => {
             password: password.value
           }),
           { 'Content-Type': 'application/json' })
-        auth.login()
-        console.log('RESPONSE::', responseData)
+        auth.login(responseData.user.id)
+        // console.log('RESPONSE::', responseData)
       } catch (err) { }
     } else {
       try {
@@ -86,11 +85,11 @@ const Auth = () => {
             password: password.value
           }),
           { 'Content-Type': 'application/json' })
-        auth.login()
+        // auth.login(responseData.user.id)
         console.log('RESPONSE::', responseData)
       } catch (err) {}
     }
-    console.log('INPUTS::', formState.inputs)
+    // console.log('INPUTS::', formState.inputs)
   }
 
   return (
