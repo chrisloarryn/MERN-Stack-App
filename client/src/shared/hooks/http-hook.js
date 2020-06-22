@@ -19,7 +19,6 @@ export const useHttpClient = () => {
             })
             const responseData = await response.json()
 
-            console.log(responseData)
             activeHttpRequests.current = activeHttpRequests.current.filter(reqCtrl => reqCtrl !== httpAbortCtrl)
 
             if(responseData.message !== 'success') throw new Error(responseData.message)
@@ -40,6 +39,6 @@ export const useHttpClient = () => {
         }
     }, [])
 
-    return {isLoading, error, sendRequest, clearError}
+    return {isLoading, setIsLoading, error, sendRequest, clearError}
 }
 
