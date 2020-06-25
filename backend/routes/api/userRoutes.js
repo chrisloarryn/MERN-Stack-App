@@ -4,10 +4,14 @@ const {check} = require('express-validator')
 // Controllers
 const userController = require('./../../controllers/userController')
 
+// middleware
+const fileUpload = require('./../../middleware/file-upload')
+
 router.get('/', userController.getAllUsers)
 
 router.post(
     '/signup',
+    fileUpload.single('image'),
     [
         check('name')
             .not()

@@ -12,7 +12,7 @@ import {
 } from '../../shared/util/validators';
 import { useForm } from '../../shared/hooks/form-hook';
 import { useHttpClient } from '../../shared/hooks/http-hook'
-import {AuthContext} from './../../shared/context/auth-context'
+import { AuthContext } from './../../shared/context/auth-context'
 import './PlaceForm.css';
 
 const UpdatePlace = () => {
@@ -71,11 +71,14 @@ const UpdatePlace = () => {
       await sendRequest(
         `http://localhost:5000/api/v1/places/${placeId}`,
         'PATCH',
-        JSON.stringify({ 
-          title: title.value, 
-          description: description.value 
+        JSON.stringify({
+          title: title.value,
+          description: description.value
         }),
-        { 'Content-Type': 'application/json' }
+        {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`
+        }
       )
       history.push(`/${auth.userId}/places`)
     } catch (err) { }

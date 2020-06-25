@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const uuid = require('uuid').v4
 const {validationResult} = require('express-validator')
 const mongoose = require('mongoose')
@@ -43,11 +45,24 @@ exports.updatePlaceByIdService = catchAsync(async (req, res, next) => {
     }
     const {title, description} = req.body
 
-
-    const place = await Place.findById(placeId)
+    let placeCount
+    try {
+        place = await Place.findById(placeId)
+    } catch (err) {
+        return next(
+            new AppError('Something went wrong, could not update place.', 422)
+        )
+    }
+    
     if (!place || place.length === 0) {
         return next(
             new AppError('Could not find a place to update for the provided place id.', 404)
+        )
+    }
+
+    if(place.creator.toString() !== req.userData.userId) {
+        return next(
+            new AppError('You are not allowed to edit this place.', 401)
         )
     }
 
@@ -79,6 +94,14 @@ exports.deletePlaceByIdService = catchAsync(async (req, res, next) => {
         return next(new AppError('Could not find a place for the provided id.', 404))
     }
 
+    if(place.creator.id !== req.userData.userId) {
+        return next(
+            new AppError('You are not allowed to delete this place.', 401)
+        )
+    }
+
+    const imagePath = place.image
+
     try {
         const sess = await mongoose.startSession();
         sess.startTransaction();
@@ -90,8 +113,8 @@ exports.deletePlaceByIdService = catchAsync(async (req, res, next) => {
         return next(new AppError('Deleting place failed, please try again.', 500))
     }
 
+    fs.unlink(imagePath, err => console.log(err))
     
-
     // place.remove({_id: placeId})
 
     res.status(200).json({
@@ -163,8 +186,7 @@ exports.createPlaceService = catchAsync(async (req, res, next) => {
         description,
         address,
         location: coordinates,
-        image:
-            'https://static2.abc.es/media/tecnologia/2020/01/20/whatsapp-youtube-kHFB--620x349@abc.jpg',
+        image: req.file.path,
         creator
     })
 

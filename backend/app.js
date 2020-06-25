@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
@@ -26,6 +29,8 @@ app.use((req, res, next) => {
 // Set as Json
 app.use(bodyParser.json({ limit: '10kb' }))
 
+app.use('/uploads/images', express.static(path.join('uploads', 'images')))
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
@@ -41,13 +46,14 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10kb' }))
 
 // 2) ROUTES
 app.use(`${service}${version}`, apiRouter)
-// app.use((error, req, res, next) => {
-//     if (res.headerSent) {
-//         return next(error)
-//     }
-//     res.status(error.code || 500)
-//     res.json({message: error.message || 'An unknown error occurred'})
-// })
+app.use((error, req, res, next) => {
+    if (req.file) fs.unlink(req.file.path, (err) => console.log(err))
+    // if (res.headerSent) {
+    //     return next(error)
+    // }
+    // res.status(error.code || 500)
+    res.json({message: error.message || 'An unknown error occurred'})
+})
 
 
 app.all('*', (req, res, next) => {
