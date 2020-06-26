@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const AppError = require('./../utils/appError')
 
 module.exports = (req, res, next) => {
+  
   if(req.method === 'OPTIONS') return next()
   try {
     const token = req.headers.authorization.split(' ')[1] // Authorization: 'Bearer TOKEN' <- part of string
