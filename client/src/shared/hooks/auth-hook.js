@@ -7,7 +7,6 @@ export const useAuth = () => {
   const [tokenExpirationDate, setTokenExpirationDate] = useState()
   const [userId, setUserId] = useState(false)
 
-
   const login = useCallback(({ userId, token, expiration }) => {
     setToken(token)
     setUserId(userId)

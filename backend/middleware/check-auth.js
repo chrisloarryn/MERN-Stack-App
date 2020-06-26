@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 
-const AppError = require('./../utils/AppError')
+const AppError = require('./../utils/appError')
 
 module.exports = (req, res, next) => {
   if(req.method === 'OPTIONS') return next()

@@ -1,0 +1,8 @@
+{
+  "env": {
+    "DB_USER": "chrisloarryn",
+    "DB_PASSWORD": "AxfXLkN2gmf0exuM",
+    "DB_NAME": "places",
+    "GOOGLE_API_KEY": "AIzaSyDIk_bUzqXSiEGjnvSVy7Yn6cXrR7jeUvM"
+  }
+}
