@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { check } = require('express-validator')
 
-// Controllers && Middlewares
+// Controllers && Middleware
 const checkAuth = require('./../../middleware/check-auth')
 const placeController = require('./../../controllers/placeController')
 const fileUpload = require('./../../middleware/file-upload')
