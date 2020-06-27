@@ -1,6 +1,6 @@
 const placeService = require('./../services/placeServices')
 
-// 
+//
 exports.getAllPlaces = placeService.getAllPlacesService
 exports.getPlacesByUserId = placeService.getPlacesByUserIdService
 
