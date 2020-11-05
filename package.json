@@ -1,0 +1,28 @@
+{
+  "name": "MERN-Stack-App",
+  "version": "1.0.0",
+  "description": "",
+  "main": "vvv.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install:back": "cd backend && npm i",
+    "install:front": "cd client && npm i",
+    "start:back": "cd backend && npm run dev",
+    "start:win": "cd backend && npm run dev:win",
+    "start:front": "cd client && npm start",
+    "install": "npm run install:back && npm run install:front",
+    "start": "npm run start:back && npm run start:front",
+    "start:windows": "npm run start:front && npm run start:win"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisloarryn/MERN-Stack-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chrisloarryn/MERN-Stack-App/issues"
+  },
+  "homepage": "https://github.com/chrisloarryn/MERN-Stack-App#readme"
+}
