@@ -10,7 +10,7 @@ import { AuthContext } from '../../shared/context/auth-context'
 import { useHttpClient } from './../../shared/hooks/http-hook'
 import './PlaceItem.css'
 
-const PlaceItem = props => {
+const PlaceItem = (props) => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient()
   const auth = useContext(AuthContext)
   const [showMap, setShowMap] = useState(false)
@@ -32,13 +32,13 @@ const PlaceItem = props => {
     setShowConfirmModal(false)
     try {
       await sendRequest(
-        `http://localhost:5000/api/v1/places/${props.id}`, 
-        'DELETE', 
-        null, 
+        `http://localhost:5000/api/v1/places/${props.id}`,
+        'DELETE',
+        null,
         { Authorization: `Bearer ${auth.token}` }
       )
       props.onDelete(props.id)
-    } catch (err) { }
+    } catch (err) {}
   }
 
   return (
@@ -81,7 +81,10 @@ const PlaceItem = props => {
         <Card className='place-item__content'>
           {isLoading && <LoadingSpinner asOverlay />}
           <div className='place-item__image'>
-            <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
+            <img
+              src={`http://localhost:5000/${props.image}`}
+              alt={props.title}
+            />
           </div>
           <div className='place-item__info'>
             <h2>{props.title}</h2>
